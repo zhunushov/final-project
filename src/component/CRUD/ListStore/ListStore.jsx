@@ -6,11 +6,7 @@ import { Link } from 'react-router-dom';
 import { hotelsContext } from '../../../MyContext/MyContext';
 
 const ListStore = () => {
-  // // {item._document.data.value.mapValue.fields.rating.stringValue}
-  //   const dispatch = useDispatch()
-  //   const hotels = useSelector(state =>  state.hotelReducer.hotels);
-    const { hotels, getHotelsCard, addCartHotel, handleDelete } = useContext(hotelsContext)
-    console.log(hotels);
+    const { hotels, getHotelsCard, addCartHotel, handleDelete, checkHotelInCart } = useContext(hotelsContext)
 
     useEffect(() => {
         getHotelsCard()
@@ -38,11 +34,10 @@ const ListStore = () => {
              </Typography>
              <Typography variant='h6'>
                {item._document.data.value.mapValue.fields.rating.stringValue}
-               <IconButton>
-              <ShoppingBasketOutlined  
-              onClick={() => addCartHotel(item)}
-              // color={checkHotelInCart(item.id) ? "secondary" : "inherit"}
-              />
+
+               <IconButton  onClick={() => addCartHotel(item)}
+              color={checkHotelInCart(item.id) ? "secondary" : "inherit"}>
+              <ShoppingBasketOutlined/>
             </IconButton>
 
             <Button

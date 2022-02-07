@@ -9,6 +9,7 @@ import React, { useContext, useEffect, useState } from "react";
 import { ToastContainer } from "react-toastify";
 import { useParams } from 'react-router-dom';
 import { hotelsContext } from '../../../MyContext/MyContext';
+import { Link } from 'react-router-dom';
   const EditStore = () => {
     const { edit, editHotels, saveEditedHotel} = useContext(hotelsContext)
     const { id } = useParams()
@@ -38,7 +39,7 @@ import { hotelsContext } from '../../../MyContext/MyContext';
         }
     }
 
-    saveEditedHotel(newPost)
+    saveEditedHotel(id , newPost)
     console.log(newPost ,  'my');
     setNewPost({ name: "",  brand: "",  price: "",  description: "",  image: "",  rating: "",});
     };
@@ -109,7 +110,7 @@ import { hotelsContext } from '../../../MyContext/MyContext';
               </Select>
             </FormControl>
           </Box>
-  
+             {/* <Link to='/list'> */}
           <Button
             type="submit"
             sx={{ ml: "25%", width: "50%", mt: "20px" }}
@@ -119,6 +120,7 @@ import { hotelsContext } from '../../../MyContext/MyContext';
             {" "}
             Save
           </Button>
+             {/* </Link> */}
         </form>
         <ToastContainer />
       </div>

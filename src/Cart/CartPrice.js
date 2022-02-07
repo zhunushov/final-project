@@ -11,6 +11,6 @@ export   function calcTotalPrice(hotels) {
   
  export  function getCountProductInCart() {
     let cart = JSON.parse(localStorage.getItem("cart"));
-    return cart ? cart.hotel.length : 0;
+    return cart ? cart.hotels.length : 0;
   }
   

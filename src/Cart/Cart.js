@@ -7,10 +7,10 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import Paper from "@mui/material/Paper";
 import { Button, IconButton, TableRow, Typography } from "@mui/material";
-import DeleteIcon from "@mui/icons-material/Delete";
 import { hotelsContext } from "../MyContext/MyContext";
-import { calcTotalPrice } from "../../CalcPrice";
 import { Link } from "react-router-dom";
+import { calcTotalPrice } from "./CartPrice";
+import { DeleteForeverOutlined } from "@material-ui/icons";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -31,7 +31,7 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
 }));
 
 export default function Cart() {
-  const { cart, getCart, changeTiketCount, deleteFromCart } = useContext(hotelsContext);
+  const { cart, getCart, deleteFromCart, changeTiketCount  } = useContext(hotelsContext);
 
   useEffect(() => {
     getCart();
@@ -58,37 +58,38 @@ export default function Cart() {
                   <StyledTableCell component="th" scope="row">
                     <img
                       width="200px"
-                      src={elem.item.image}
-                      alt={elem.item.name}
+                      src={elem.item._document.data.value.mapValue.fields.image.stringValue}
+                      alt={elem.item._document.data.value.mapValue.fields.name.stringValue}
                     />
                   </StyledTableCell>
                   <StyledTableCell align="center">
-                    {elem.item.price}
+                    {elem.item._document.data.value.mapValue.fields.name.stringValue}
                   </StyledTableCell>
                   <StyledTableCell height="120" align="center">
-                    {elem.item.brand}
+                    {elem.item._document.data.value.mapValue.fields.name.stringValue}
                   </StyledTableCell>
                   <StyledTableCell align="center">
                     <input
                       type="number"
                       value={elem.count}
                       onChange={(e) =>
-                        changeTiketCount(e.target.value, elem.item.id)
+                        changeTiketCount(e.target.value, elem.item._document.id)
                       }
                       min="1"
                     />
                   </StyledTableCell>
                   <StyledTableCell align="center">
-                    {elem.subPrice}
+                   { console.log(elem.subPrice, "sub")}
+                   {elem.subPrice}
                   </StyledTableCell>
                   <StyledTableCell align="center">
                     <IconButton
                       aria-label="delete"
-                      onClick={(e) =>
+                      onClick={() =>
                         deleteFromCart(elem.item.id, elem.item.price)
                       }
                     >
-                      <DeleteIcon />
+                      <DeleteForeverOutlined />
                     </IconButton>
                   </StyledTableCell>
                 </StyledTableRow>
@@ -101,7 +102,6 @@ export default function Cart() {
               </TableCell>
             </TableRow>
           )}
-
           <TableRow>
             <TableCell rowSpan={3} />
             <TableCell colSpan={2}>

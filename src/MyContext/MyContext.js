@@ -1,7 +1,8 @@
 import  React, { createContext, useReducer } from "react";
-import { addDoc, collection, deleteDoc, doc, getDoc, onSnapshot, query } from "firebase/firestore";
+import { addDoc, collection, deleteDoc, doc, getDoc, onSnapshot, query, updateDoc } from "firebase/firestore";
 import { calcSubPrice, calcTotalPrice } from "../Cart/CartPrice";
 import { db } from "../Auth/Firebase";
+import { toast } from "react-toastify";
 
 export const hotelsContext = createContext()
 
@@ -65,7 +66,6 @@ const MyContext = (props) => {
             const res = query(collection(db, "stores"));
             const unsubscribe = onSnapshot(res, (item) => {
             const hotels = [];
-            console.log(hotels);
             item.forEach((item) => {
                 hotels.push(item);
             });
@@ -106,7 +106,6 @@ const MyContext = (props) => {
       try {
           const docRef = doc(db, "stores", id);
           updateDoc(docRef, newHotel)
-          console.log(updatedProduct, 'up');
           getHotelsCard()
       } catch (error) {
           console.log('SAVE_HOTEL_ERR', error);
@@ -129,10 +128,11 @@ const MyContext = (props) => {
         };
         let filteredCart = cart.hotels.filter((elem) => elem.item.id === hotel.id);
         if (filteredCart.length > 0) {
-          cart.hotels = cart.hotels.filter((elem) => elem.item.id === hotel.id);
+          cart.hotels = cart.hotels.filter((elem) => elem.item.id !== hotel.id);
         } else {
           cart.hotels.push(newProduct);
         }
+        
         newProduct.subPrice = calcSubPrice(newProduct);
         cart.totalPrice = calcTotalPrice(cart.hotels);
         localStorage.setItem("cart", JSON.stringify(cart));
@@ -222,7 +222,6 @@ const MyContext = (props) => {
         <hotelsContext.Provider
         value={{
          hotels: state.hotels,
-         hotel: state.hotel,
          edit: state.edit,
          cart: state.cart,
          cartlength: state.cartlength,
