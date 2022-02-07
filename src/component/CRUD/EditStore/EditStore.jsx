@@ -5,15 +5,12 @@ import { Box, Button,  FormControl,
     Select,
     TextField,
   } from '@mui/material';
-  import { editHotels, saveEditedHotel } from '../../CrudRedux';
-  import React, { useEffect, useState } from "react";
-  import { ToastContainer } from "react-toastify";
-  import { useDispatch, useSelector } from 'react-redux';
+import React, { useContext, useEffect, useState } from "react";
+import { ToastContainer } from "react-toastify";
 import { useParams } from 'react-router-dom';
+import { hotelsContext } from '../../../MyContext/MyContext';
   const EditStore = () => {
-
-    const dispatch = useDispatch()
-    const edit = useSelector(state => state.hotelReducer.edit)
+    const { edit, editHotels, saveEditedHotel} = useContext(hotelsContext)
     const { id } = useParams()
     const [newPost, setNewPost] = useState({
       name: "",
@@ -25,31 +22,33 @@ import { useParams } from 'react-router-dom';
     });
 
     useEffect(() => {
-       dispatch(editHotels(id))
+      editHotels(id)
     }, [id])
     
     useEffect(() => {
-        if(edit) setNewPost(edit)
+        if(edit)setNewPost(edit)
     }, [edit])
 
     const handleSubmit = async (event) => {
       event.preventDefault();
-      console.log(newPost);
       for (const key in newPost) {
         if (!newPost[key]) {
           alert("Заполните поля");
           return;
         }
-      }
-    dispatch(saveEditedHotel(newPost));
+    }
+
+    saveEditedHotel(newPost)
+    console.log(newPost ,  'my');
     setNewPost({ name: "",  brand: "",  price: "",  description: "",  image: "",  rating: "",});
     };
+
 
     return (
       <div>
         <form onSubmit={handleSubmit}>
-        <h2>edit</h2>
           <Box sx={{ mt: "50px" }}>
+            <h2 style={{textAlign: 'center'}}>edit</h2>
             <TextField
               onChange={(e) => setNewPost({ ...newPost, name: e.target.value })}
               value={newPost.name}

@@ -5,13 +5,11 @@ import { Box, Button,  FormControl,
     Select,
     TextField,
   } from '@mui/material';
-  import { createStore } from '../../CrudRedux';
-  import React, { useState } from "react";
+  import React, { useContext, useState } from "react";
   import { ToastContainer } from "react-toastify";
-  import { useDispatch } from 'react-redux';
-  import { v4 as uuidv4} from "uuid"
+  import { hotelsContext } from '../../../MyContext/MyContext';
   const AddStore = () => {
-    const dispatch = useDispatch()
+    const {createStore, } = useContext(hotelsContext)
     const [newPost, setNewPost] = useState({
       name: "",
       brand: "",
@@ -30,13 +28,13 @@ import { Box, Button,  FormControl,
         }
        
       }
-    dispatch(createStore(newPost, {id: uuidv4.id}));
+    createStore(newPost)
     setNewPost({ name: "",  brand: "",  price: "",  description: "",  image: "",  rating: "",});
     };
     return (
       <div>
         <form onSubmit={handleSubmit}>
-        <h2>Add</h2>
+        <h2 style={{textAlign: 'center'}}>Add</h2>
           <Box sx={{ mt: "50px" }}>
             <TextField
               onChange={(e) => setNewPost({ ...newPost, name: e.target.value })}

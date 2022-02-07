@@ -1,35 +1,69 @@
-import { Box, Grid } from '@material-ui/core';
-import React, { useEffect } from 'react';
-import { useSelector } from 'react-redux';
-import { useDispatch } from 'react-redux';
-import { getHotelsCard } from '../../CrudRedux';
-import CardStore from './CardStore/CardStore';
+import { Box, Button, Card, CardContent, CardMedia, Grid, IconButton, Typography } from '@material-ui/core';
+import { ShoppingBasketOutlined } from '@material-ui/icons';
+import { CssBaseline } from '@mui/material';
+import React, { useContext, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import { hotelsContext } from '../../../MyContext/MyContext';
 
 const ListStore = () => {
-    const dispatch = useDispatch()
-    const hotels = useSelector(state =>  state.hotelReducer.hotels);
+  // // {item._document.data.value.mapValue.fields.rating.stringValue}
+  //   const dispatch = useDispatch()
+  //   const hotels = useSelector(state =>  state.hotelReducer.hotels);
+    const { hotels, getHotelsCard, addCartHotel, handleDelete } = useContext(hotelsContext)
+    console.log(hotels);
 
     useEffect(() => {
-        dispatch(getHotelsCard())
+        getHotelsCard()
     },[])
 
     return (
-    <Box>
-       <Grid
-        container
-        spacing={{ xs: 2, md: 3 }}
-        columns={{ xs: 4, sm: 8, md: 12 }}>
-        {hotels && hotels.length > 0 ? (
-          hotels.map((item, index) => (
-            <Grid item xs={2} sm={4} md={4} key={index}>
-               <CardStore item={item} key={index} />
-            </Grid>
-          ))
-        ) : (
-          <h1>Loading....</h1>
-        )}
-        </Grid>
+      <>
+      <CssBaseline />
+       <Box  spacing={2}>
+      { hotels && hotels.length > 0 ? (
+         hotels.map((item, index) => (
+           <Grid xs={24} sm={2} md={6} >
+             <Grid >
+           <Card container key={index}>
+            <CardMedia image={item._document.data.value.mapValue.fields.image.stringValue}  style={{height: 350}} />
+            <CardContent>
+             <Typography  variant='h6'>
+               {item._document.data.value.mapValue.fields.name.stringValue}
+             </Typography>
+             <Typography  variant='h5'>
+               {item._document.data.value.mapValue.fields.brand.stringValue}
+             </Typography>
+             <Typography  variant='p'>
+               {item._document.data.value.mapValue.fields.price.stringValue}
+             </Typography>
+             <Typography variant='h6'>
+               {item._document.data.value.mapValue.fields.rating.stringValue}
+               <IconButton>
+              <ShoppingBasketOutlined  
+              onClick={() => addCartHotel(item)}
+              // color={checkHotelInCart(item.id) ? "secondary" : "inherit"}
+              />
+            </IconButton>
+
+            <Button
+            onClick={() =>  handleDelete(item.id)}
+            className="btn-danger">
+             Delete
+             </Button>
+             <Link to={`edit/${item.id}`} >
+             <Button >
+                 Edit
+             </Button>
+             </Link>
+
+             </Typography>
+           </CardContent>
+        </Card>
+             </Grid>
+           </Grid>
+        ))): (<h1 style={{textAlign:'center'}}>loading...</h1> )}
     </Box>
+    </>
     );
 };
 
