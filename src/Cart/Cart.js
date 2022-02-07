@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from "react";
+import React, { useContext } from "react";
 import { styled } from "@mui/material/styles";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -9,9 +9,8 @@ import Paper from "@mui/material/Paper";
 import { Button, IconButton, TableRow, Typography } from "@mui/material";
 import { hotelsContext } from "../MyContext/MyContext";
 import { Link } from "react-router-dom";
-import { calcTotalPrice } from "./CartPrice";
 import { DeleteForeverOutlined } from "@material-ui/icons";
-
+import { addDoc, collection, deleteDoc, doc, getDoc, onSnapshot } from "firebase/firestore";
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
     backgroundColor: theme.palette.common.black,
@@ -31,11 +30,24 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
 }));
 
 export default function Cart() {
-  const { cart, getCart, deleteFromCart, changeTiketCount  } = useContext(hotelsContext);
+  const { cart, hotels  } = useContext(hotelsContext);
 
-  useEffect(() => {
-    getCart();
-  }, []);
+  function removetocart(item) {
+    hotels.map((i) => {
+      if(i.id == item.id){
+        i.cart = false
+      }
+    })
+    db.collection("cart").doc(`${item.id}`).delete()
+  }
+  function incrementHotel (item) {
+    db.collection("cart").doc(`${item.id}`).update("quantity",
+     fs.firestore.FieldValue.increment(1))
+    
+  }
+  function decrementHotel(item) {
+   db.collection('cart').doc(`${item.id}`).update("quantity", fs.firestore.FieldValue.increment(-1))
+  }
 
   return (
     <TableContainer component={Paper}>
@@ -51,32 +63,31 @@ export default function Cart() {
           </TableRow>
         </TableHead>
         <TableBody>
-          {cart.hotels ? (
+          {cart?.length > 0 ? (
             <>
-              {cart.hotels.map((elem) => (
-                <StyledTableRow key={elem.item.id}>
+              {cart.map((elem, index) => (
+                <StyledTableRow key={elem.id}>
                   <StyledTableCell component="th" scope="row">
                     <img
                       width="200px"
-                      src={elem.item._document.data.value.mapValue.fields.image.stringValue}
-                      alt={elem.item._document.data.value.mapValue.fields.name.stringValue}
+                      src={elem.image}
+                      alt={elem.name}
                     />
                   </StyledTableCell>
                   <StyledTableCell align="center">
-                    {elem.item._document.data.value.mapValue.fields.name.stringValue}
+                    {elem.price}
                   </StyledTableCell>
                   <StyledTableCell height="120" align="center">
-                    {elem.item._document.data.value.mapValue.fields.name.stringValue}
+                    {elem.name}
                   </StyledTableCell>
                   <StyledTableCell align="center">
-                    <input
-                      type="number"
-                      value={elem.count}
-                      onChange={(e) =>
-                        changeTiketCount(e.target.value, elem.item._document.id)
-                      }
-                      min="1"
-                    />
+                    <Button onClick={() => incrementHotel(elem)}>
+                      +
+                    </Button>
+                      {elem.quantity}
+                      <Button onClick={() => decrementHotel(elem)}>
+                      -
+                    </Button>
                   </StyledTableCell>
                   <StyledTableCell align="center">
                    { console.log(elem.subPrice, "sub")}
@@ -86,7 +97,7 @@ export default function Cart() {
                     <IconButton
                       aria-label="delete"
                       onClick={() =>
-                        deleteFromCart(elem.item.id, elem.item.price)
+                        removetocart(elem)
                       }
                     >
                       <DeleteForeverOutlined />
@@ -110,7 +121,7 @@ export default function Cart() {
             {cart.hotels ? (
               <TableCell align="right">
                 <Typography variant="h5">
-                  {calcTotalPrice(cart.hotels)}
+                  {total()}
                 </Typography>
               </TableCell>
             ) : null}

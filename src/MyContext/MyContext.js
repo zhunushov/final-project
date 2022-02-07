@@ -1,16 +1,14 @@
-import  React, { createContext, useReducer } from "react";
+import  React, { createContext, useEffect, useReducer, useState } from "react";
 import { addDoc, collection, deleteDoc, doc, getDoc, onSnapshot, query, updateDoc } from "firebase/firestore";
-import { calcSubPrice, calcTotalPrice } from "../Cart/CartPrice";
-import { db } from "../Auth/Firebase";
+import { fs, db,  } from "../Auth/Firebase";
 import { toast } from "react-toastify";
-
 export const hotelsContext = createContext()
 
 const INIT_STATE = { 
     hotels: [],
     edit: null,
     // cart
-    cart: {},
+    cart: [],
     cartlength: 0,
     // like 
     like: null,
@@ -113,110 +111,113 @@ const MyContext = (props) => {
      }
 
      // !   cart
-    const addCartHotel = (hotel) => {
-        let cart = JSON.parse(localStorage.getItem("cart"));
-        if (!cart) {
-          cart = {
-            hotels: [],
-            totalPrice: 0,
-          };
-        }
-        let newProduct = {
-          item: hotel,
-          count: 1,
-          subPrice: 0,
-        };
-        let filteredCart = cart.hotels.filter((elem) => elem.item.id === hotel.id);
-        if (filteredCart.length > 0) {
-          cart.hotels = cart.hotels.filter((elem) => elem.item.id !== hotel.id);
-        } else {
-          cart.hotels.push(newProduct);
-        }
+    // const addCartHotel = (hotel) => {
+    //     let cart = JSON.parse(localStorage.getItem("cart"));
+    //     if (!cart) {
+    //       cart = {
+    //         hotels: [],
+    //         totalPrice: 0,
+    //       };
+    //     }
+    //     let newProduct = {
+    //       item: hotel,
+    //       count: 1,
+    //       subPrice: 0,
+    //     };
+    //     let filteredCart = cart.hotels.filter((elem) => elem.item.id === hotel.id);
+    //     if (filteredCart.length > 0) {
+    //       cart.hotels = cart.hotels.filter((elem) => elem.item.id !== hotel.id);
+    //     } else {
+    //       cart.hotels.push(newProduct);
+    //     }
         
-        newProduct.subPrice = calcSubPrice(newProduct);
-        cart.totalPrice = calcTotalPrice(cart.hotels);
-        localStorage.setItem("cart", JSON.stringify(cart));
+    //     newProduct.subPrice = calcSubPrice(newProduct);
+    //     cart.totalPrice = calcTotalPrice(cart.hotels);
+    //     localStorage.setItem("cart", JSON.stringify(cart));
     
-        dispatch({
-            type: GET_CART_LENGTH,
-            payload: cart.hotels.length
-        })
-      };
+    //     dispatch({
+    //         type: GET_CART_LENGTH,
+    //         payload: cart.hotels.length
+    //     })
+    //   };
     
-    const getCartLength = () => {
-        let cart = JSON.parse(localStorage.getItem("cart"));
-        if (!cart) {
-          cart = {
-            hotels: [],
-            totalPrice: 0,
-          };
-        }
+    // const getCartLength = () => {
+    //     let cart = JSON.parse(localStorage.getItem("cart"));
+    //     if (!cart) {
+    //       cart = {
+    //         hotels: [],
+    //         totalPrice: 0,
+    //       };
+    //     }
        
-        dispatch({
-            type: GET_CART_LENGTH,
-            payload: cart.hotels.length,
-          });
-      };
+    //     dispatch({
+    //         type: GET_CART_LENGTH,
+    //         payload: cart.hotels.length,
+    //       });
+    //   };
     
-      const getCart = () => {
-        let cart = JSON.parse(localStorage.getItem("cart"));
-        if (!cart) {
-          cart = {
-            hotels: [],
-            totalPrice: 0,
-          };
-        }
-        dispatch({
-            type: GET_CART,
-            payload: cart
-          });
-      };
+    //   const getCart = () => {
+    //     let cart = JSON.parse(localStorage.getItem("cart"));
+    //     if (!cart) {
+    //       cart = {
+    //         hotels: [],
+    //         totalPrice: 0,
+    //       };
+    //     }
+    //     dispatch({
+    //         type: GET_CART,
+    //         payload: cart
+    //       });
+    //   };
       
-     const changeHotelCount = (count, id) => {
-        let cart = JSON.parse(localStorage.getItem("cart"));
-        cart.hotels = cart.hotels.map((elem) => {
-          if (elem.item.id === id) {
-            elem.count = count;
-            elem.subPrice = calcSubPrice(elem);
-          }
-          return elem;
-        });
-        cart.totalPrice = calcTotalPrice(cart.hotels);
-        localStorage.setItem("cart", JSON.stringify(cart));
-        getCartLength();
-        getCart();
-      };
+    //  const changeHotelCount = (count, id) => {
+    //     let cart = JSON.parse(localStorage.getItem("cart"));
+    //     cart.hotels = cart.hotels.map((elem) => {
+    //       if (elem.item.id === id) {
+    //         elem.count = count;
+    //         elem.subPrice = calcSubPrice(elem);
+    //       }
+    //       return elem;
+    //     });
+    //     cart.totalPrice = calcTotalPrice(cart.hotels);
+    //     localStorage.setItem("cart", JSON.stringify(cart));
+    //     getCartLength();
+    //     getCart();
+    //   };
     
-    const checkHotelInCart = (id) => {
-        let cart = JSON.parse(localStorage.getItem("cart"));
-        if (!cart) {
-          cart = {
-            hotels: [],
-            totalPrice: 0,
-          };
-        }
-        let newcart = cart.hotels.filter((elem) => elem.id === id);
-        return newcart.length > 0 ? true : false;
-      };
+    // const checkHotelInCart = (id) => {
+    //     let cart = JSON.parse(localStorage.getItem("cart"));
+    //     if (!cart) {
+    //       cart = {
+    //         hotels: [],
+    //         totalPrice: 0,
+    //       };
+    //     }
+    //     let newcart = cart.hotels.filter((elem) => elem.id === id);
+    //     return newcart.length > 0 ? true : false;
+    //   };
     
-     const deleteFromCart = (id, price) => {
-        let items = JSON.parse(localStorage.getItem("cart"));
-        for (let i = 0; i < items.hotels.length; i++) {
-          let targetItem = JSON.parse(items.hotels[i].item.id);
-          let targetItemPrice = JSON.parse(items.hotels[i].item.price);
+    //  const deleteFromCart = (id, price) => {
+    //     let items = JSON.parse(localStorage.getItem("cart"));
+    //     for (let i = 0; i < items.hotels.length; i++) {
+    //       let targetItem = JSON.parse(items.hotels[i].item.id);
+    //       let targetItemPrice = JSON.parse(items.hotels[i].item.price);
     
-          if (targetItem == id) {
-            items.hotels.splice(i, 1);
-          }
-          if (targetItemPrice == price) {
-            items.totalPrice = items.totalPrice - price;
-          }
-        }
-        items = JSON.stringify(items);
-        console.log(items);
-        localStorage.setItem("cart", items);
-        getCart();
-      };
+    //       if (targetItem == id) {
+    //         items.hotels.splice(i, 1);
+    //       }
+    //       if (targetItemPrice == price) {
+    //         items.totalPrice = items.totalPrice - price;
+    //       }
+    //     }
+    //     items = JSON.stringify(items);
+    //     console.log(items);
+    //     localStorage.setItem("cart", items);
+    //     getCart();
+    //   };
+         
+
+
 
     return (
         <hotelsContext.Provider
@@ -233,12 +234,14 @@ const MyContext = (props) => {
          editHotels,
          saveEditedHotel,
         //  cart
-         addCartHotel,
-         getCart,
-         getCartLength,
-         changeHotelCount,
-         checkHotelInCart,
-         deleteFromCart
+        //  addCartHotel,
+        //  getCart,
+        //  getCartLength,
+        //  changeHotelCount,
+        //  checkHotelInCart,
+        //  deleteFromCart
+      
+
         }}>
             {props.children}
         </hotelsContext.Provider>

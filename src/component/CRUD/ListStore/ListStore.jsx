@@ -1,4 +1,5 @@
 import { Box, Button, Card, CardContent, CardMedia, Grid, IconButton, Typography } from '@material-ui/core';
+import { addDoc, collection, deleteDoc, doc, getDoc, onSnapshot } from "firebase/firestore";
 import { ShoppingBasketOutlined } from '@material-ui/icons';
 import { CssBaseline } from '@mui/material';
 import React, { useContext, useEffect } from 'react';
@@ -6,11 +7,50 @@ import { Link } from 'react-router-dom';
 import { hotelsContext } from '../../../MyContext/MyContext';
 
 const ListStore = () => {
-    const { hotels, getHotelsCard, addCartHotel, handleDelete, checkHotelInCart } = useContext(hotelsContext)
+
+    const { hotels, cart,  getHotelsCard,  handleDelete } = useContext(hotelsContext)
 
     useEffect(() => {
         getHotelsCard()
     },[])
+
+    useEffect(() => {
+      db.collection("cart")
+      .onSnapshot((querySnapshot) => {
+        let p = []
+        querySnapshot.forEach((doc) => {
+          p.push(doc.data())
+          hotels.map((i) => {
+            if(i.id == doc.data().id){
+              i.cart = true
+            }
+          })
+        })
+       setHotels(p)
+      })
+  }, [])
+
+function  addCart (item) {
+
+  hotels.map((i) => {
+   if(i.id == item.id) {
+     i.cart = true
+   }
+ })
+
+ db.collection("cart").doc(`${item.id}`).set(item, {merge: true})
+}
+
+
+
+function total() {
+ let x = 0 
+ cart.map((i) => {
+   x += i.price * i.quantity
+
+ })
+ return x
+}
 
     return (
       <>
@@ -35,10 +75,18 @@ const ListStore = () => {
              <Typography variant='h6'>
                {item._document.data.value.mapValue.fields.rating.stringValue}
 
-               <IconButton  onClick={() => addCartHotel(item)}
-              color={checkHotelInCart(item.id) ? "secondary" : "inherit"}>
-              <ShoppingBasketOutlined/>
-            </IconButton>
+           {
+             item.cart == false && 
+               <IconButton  onClick={() => addCart(item)}  >
+               <ShoppingBasketOutlined/>
+               </IconButton>
+            }
+            {
+              item.cart == true && 
+              <IconButton  onClick={() => addCart(item)}  >
+              <ShoppingBasketOutlined color='secondary'/>
+              </IconButton>
+            }
 
             <Button
             onClick={() =>  handleDelete(item.id)}
