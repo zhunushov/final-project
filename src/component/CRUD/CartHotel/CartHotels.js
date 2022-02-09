@@ -5,8 +5,9 @@ import React, { useContext, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { hotelsContext } from '../../../MyContext/MyContext';
 const ListStore = ({ item }) => {  
-    const {addCartHotel, handleDelete, checkHotelInCart, addFovHotel } = useContext(hotelsContext)
+    const {addProductInCart, handleDelete, checkProductInCart,  addProductInFavorite } = useContext(hotelsContext)
 
+  console.log(item);
     return (
       <>
       <CssBaseline />
@@ -22,18 +23,18 @@ const ListStore = ({ item }) => {
               Type:   {item._document.data.value.mapValue.fields.brand.stringValue}
              </Typography>
              <Typography  variant='body1'>
-              Price $  {item._document.data.value.mapValue.fields.price.stringValue}
+              Price $  {item._document.data.value.mapValue.fields.price.integerValue}
              </Typography>
              <Typography variant='h6'>
                Rading:  {item._document.data.value.mapValue.fields.rating.stringValue}
                </Typography>
 
-               <IconButton  onClick={() => addCartHotel(item)}
-               color={checkHotelInCart(item.id) ? "varning" : "inherit"}
+               <IconButton  onClick={() => addProductInCart(item)}
+               color={checkProductInCart(item.id) ? 'primary' : 'inherit'}
               >
               <ShoppingCart/>
             </IconButton>
-            <Button onClick={() => addFovHotel(item)}>
+            <Button onClick={() => addProductInFavorite(item)}>
               <Bookmark  color='green'/>
             </Button>
             </div>

@@ -2,8 +2,17 @@ import { Box, Button, Container, CssBaseline, Typography, Grid, TextField } from
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { signin } from './Auth';
+import { GoogleAuthProvider , signInWithPopup } from 'firebase/auth';
+import { auth } from './Firebase';
 const Login = () => {
-   
+    const provider = new GoogleAuthProvider()
+    const authGoogle = async () => {
+        try {
+            const res = await signInWithPopup(auth, provider)
+        } catch (error) {
+            console.log(error);
+        }
+    }
     const navigate = useNavigate()
     const handleSubmit =(event) => {
         const data = new FormData(event.currentTerget)
@@ -48,6 +57,7 @@ const Login = () => {
           <Grid item xs={2} md={2} sm={2}>
               <Button type='submit' color="secondary">Sign In</Button>
               <Link to='/register'><Button> Sign Up</Button></Link>
+              <Button onClick={authGoogle}>Google </Button>
           </Grid>
         </Box>
      </Container>

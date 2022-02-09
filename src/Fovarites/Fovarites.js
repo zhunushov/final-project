@@ -31,10 +31,11 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
 }));
 
 export default function Cart() {
-  const { favorites, getFov, deleteFromFov, changeHotelCountFov  } = useContext(hotelsContext);
-   console.log(favorites.fav, 'fov');
+  const { favorite,
+    getFavorite,
+    deleteFromFavorite,  } = useContext(hotelsContext);
   useEffect(() => {
-    getFov();
+    getFavorite()
   }, []);
 
   return (
@@ -48,9 +49,9 @@ export default function Cart() {
           </TableRow>
         </TableHead>
         <TableBody>
-          {favorites.hotels ? (
+          {favorite.products ? (
             <>
-              {favorites.hotels.map((elem, index) => (
+              {favorite.products.map((elem, index) => (
                 <StyledTableRow key={index}>
                   <StyledTableCell component="th" scope="row">
                     <img
@@ -66,7 +67,7 @@ export default function Cart() {
                     <IconButton
                       aria-label="delete"
                       onClick={() =>
-                        deleteFromFov(elem.item.id, elem.item.price)
+                        deleteFromFavorite(elem.item.id, elem.item.price)
                       }
                     >
                       <DeleteForeverOutlined />

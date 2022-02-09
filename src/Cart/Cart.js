@@ -31,7 +31,7 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
 }));
 
 export default function Cart() {
-  const { cart, getCart, deleteFromCart, changeHotelCount } = useContext(hotelsContext);
+  const { cart, getCart, deleteFromCart, changeProductCount } = useContext(hotelsContext);
   useEffect(() => {
     getCart();
   }, []);
@@ -50,9 +50,9 @@ export default function Cart() {
           </TableRow>
         </TableHead>
         <TableBody>
-          {cart.hotels ? (
+          {cart.products ? (
             <>
-              {cart.hotels.map((elem, index) => (
+              {cart.products.map((elem, index) => (
                 <StyledTableRow key={index}>
                   <StyledTableCell component="th" scope="row">
                     <img
@@ -65,20 +65,21 @@ export default function Cart() {
                     {elem.item._document.data.value.mapValue.fields.name.stringValue}
                   </StyledTableCell>
                   <StyledTableCell height="120" align="center">
-                    {elem.item._document.data.value.mapValue.fields.price.stringValue}
+                    {elem.item._document.data.value.mapValue.fields.price.integerValue}
                   </StyledTableCell>
                   <StyledTableCell align="center">
                     <input
                       type="number"
                       value={elem.count}
                       onChange={(e) =>
-                        changeHotelCount(e.target.value, elem.item.id)
+                        changeProductCount(e.target.value, elem.item.id)
                       }
                       min="1"
                     />
                   </StyledTableCell>
                   <StyledTableCell align="center">
-                   {elem.item._document.data.value.mapValue.fields.brand.stringValue}
+                   {elem.item.subPrice}
+                   {console.log(elem.subPrice, "ss")}
                   </StyledTableCell>
                   <StyledTableCell align="center">
                     <IconButton
@@ -105,10 +106,10 @@ export default function Cart() {
             <TableCell colSpan={2}>
               <Typography variant="h5">Total:</Typography>
             </TableCell>
-            {cart.hotels ? (
+            {cart.products ? (
               <TableCell align="right">
                 <Typography variant="h5">
-                  {calcTotalPrice(cart.hotels)}
+                  {calcTotalPrice(cart.products)}
                 </Typography>
               </TableCell>
             ) : null}

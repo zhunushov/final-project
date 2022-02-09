@@ -12,12 +12,16 @@ import ListPage from './ListPage';
 import Fovarites from './Fovarites/Fovarites';
 import MyFooter from './Footer/MyFooter';
 import Google from './Auth/Google';
+import KaruselMainPage from './component/KaruselMainPage/KaruselMainPage';
+import Home from './Home/Home';
 const MyRoutes = () => {
     
     return (
         <MyContextProvider>
+            
         <BrowserRouter>
             <Routes>
+            <Route path='/' element={ <Home/> } />  
                 <Route path='/fav' element={ <Fovarites />} /> 
                 <Route path='google' element={<Google/>} />
                 <Route path='/map' element={<App2 />} />
@@ -27,6 +31,7 @@ const MyRoutes = () => {
                 <Route path='/list' element={<ListPage />} />
                 <Route path='/list/edit/:id' element={<EditStore/>} />
                 <Route path='/cart' element={<Cart/>} />
+                <Route path='/caruselMain' element={<KaruselMainPage/>} />
             </Routes>
             <MyFooter />
         </BrowserRouter>

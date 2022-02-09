@@ -3,16 +3,24 @@ import { addDoc, collection, deleteDoc, doc, getDoc, onSnapshot, query, updateDo
 import { calcSubPrice, calcSubPriceFov, calcTotalPrice, calcTotalPriceFov } from "../Cart/CartPrice";
 import { db } from "../Auth/Firebase";
 import { toast } from "react-toastify";
-
+import axios from "axios";
+import { API } from '../Halpers'
 export const hotelsContext = createContext()
-
+console.log(API);
 const INIT_STATE = { 
     hotels: [],
     edit: null,
     // cart
     cart: {},
-    cartlength: 0,
-    favorites: {}
+    cartLength: 0,
+
+    favorite: {},
+    favoriteLength: 0,
+    // 
+    pagination: 1,
+
+    // commnet
+    comment:[]
 }
 const GET_STORE = "GET_STORE"
 const EDIT_STORE = "EDIT_STORE"
@@ -21,7 +29,9 @@ const GET_CART = "GET_CART"
 const GET_CART_LENGTH = "GET_CART_LENGTH"
 
 const FAVORITES = "FAVORITES"
+const CHANGE_FAVORITE_COUNT = "CHANGE_FAVORITE_COUNT"
 
+const GET_COMMENT = "GET_COMMENT"
 const reducer = (state = INIT_STATE, action) => {
     switch(action.type) {
         case GET_STORE :
@@ -32,10 +42,16 @@ const reducer = (state = INIT_STATE, action) => {
         case GET_CART :
           return {...state, cart: action.payload}
           case GET_CART_LENGTH :
-              return {...state, cartlength: action.payload}
+              return {...state, cartLength: action.payload}
 
         case FAVORITES :
-            return {...state, favorites: action.payload}
+            return {...state, favorite: action.payload}
+        case CHANGE_FAVORITE_COUNT :
+            return {...state, favoriteLength: action.payload}
+        case GET_COMMENT:
+            return {...state, comment: action.payload.data, 
+              pagination: Math.ceil(action.payload.headers["x-total-count"] / 3)
+            }
 
         default : return state
     }
@@ -103,246 +119,299 @@ const MyContext = (props) => {
           console.log('SAVE_HOTEL_ERR', error);
       }
      }
-
+    //  !COMMENT
+    const addComment = async (commnetc ) => {
+      console.log(commnetc, "db");
+      try {
+         const res =  await axios.post(API, commnetc)
+         getComment()
+         return res
+      } catch (error) {
+        console.log(error);
+      }
+    }
+    const deleteCommnet = async (id) => {
+      try {
+        await axios.delete(`${API}/${id}`);
+        getComment();
+        toast.success("Успеншно удаленно!", { icon: "🚀" });
+      } catch (error) {
+        // ! toastify
+        toast.success("Что то пошло не так!", { icon: "🚀" });
+      }
+    };
+     
+    const getComment =  async() => {
+        try {
+          const res = await axios.get(`${API}/${window.location.search}`)
+          let action = {
+            type: GET_COMMENT,
+            payload: res
+          }
+          dispatch(action)
+        } catch (error) {
+           console.log(error);
+        }
+    }
      // !   cart
-    const addCartHotel = (hotel) => {
-        let cart = JSON.parse(localStorage.getItem("cart"));
-        if (!cart) {
+  
+    const addProductInCart = (product) => {
+      let cart = JSON.parse(localStorage.getItem('cart'))
+      if (!cart) {
           cart = {
-            hotels: [],
-            totalPrice: 0,
-          };
-        }
-        let newProduct = {
-          item: hotel,
-          count: 1,
-          subPrice: 0,
-        };
-        let filteredCart = cart.hotels.filter((elem) => elem.item.id === hotel.id);
-        if (filteredCart.length > 0) {
-          cart.hotels = cart.hotels.filter((elem) => elem.item.id !== hotel.id);
-        } else {
-          cart.hotels.push(newProduct);
-        }
-        
-        newProduct.subPrice = calcSubPrice(newProduct);
-        cart.totalPrice = calcTotalPrice(cart.hotels);
-        localStorage.setItem("cart", JSON.stringify(cart));
-    
-        dispatch({
-            type: GET_CART_LENGTH,
-            payload: cart.hotels.length
-        })
-      };
-    
-    const getCartLength = () => {
-        let cart = JSON.parse(localStorage.getItem("cart"));
-        if (!cart) {
-          cart = {
-            hotels: [],
-            totalPrice: 0,
-          };
-        }
-       
-        dispatch({
-            type: GET_CART_LENGTH,
-            payload: cart.hotels.length,
-          });
-      };
-    
-      const getCart = () => {
-        let cart = JSON.parse(localStorage.getItem("cart"));
-        if (!cart) {
-          cart = {
-            hotels: [],
-            totalPrice: 0,
-          };
-        }
-        dispatch({
-            type: GET_CART,
-            payload: cart
-          });
-      };
-      
-     const changeHotelCount = (count, id) => {
-        let cart = JSON.parse(localStorage.getItem("cart"));
-        cart.hotels = cart.hotels.map((elem) => {
-          if (elem.item.id === id) {
-            elem.count = count;
-            elem.subPrice = calcSubPrice(elem);
+              products: [],
+              totalPrice: 0
           }
-          return elem;
-        });
-        cart.totalPrice = calcTotalPrice(cart.hotels);
-        localStorage.setItem("cart", JSON.stringify(cart));
-        getCartLength();
-        getCart();
-      };
-    
-    const checkHotelInCart = (id) => {
-        let cart = JSON.parse(localStorage.getItem("cart"));
-        if (!cart) {
+      }
+
+      let newProduct = {
+          item: product,
+          count: 1,
+          subPrice: 0
+      }
+
+      let filteredCart = cart.products.filter(elem => elem.item.id === product.id)
+      if (filteredCart.length > 0){
+          cart.products = cart.products.filter(elem => elem.item.id !== product.id)
+      }else {
+          cart.products.push(newProduct)
+      }
+      newProduct.subPrice = calcSubPrice(newProduct)
+      cart.totalPrice = calcTotalPrice(cart.products)
+      localStorage.setItem('cart', JSON.stringify(cart))
+      dispatch({
+          type: GET_CART_LENGTH,
+          payload: cart.products.length
+      })
+  }
+
+  const getCartLength = () => {
+      let cart = JSON.parse(localStorage.getItem('cart'))
+      if(!cart){
           cart = {
-            hotels: [],
-            totalPrice: 0,
-          };
-        }
-        let newcart = cart.hotels.filter((elem) => elem.id === id);
-        return newcart.length > 0 ? true : false;
-      };
-    
-     const deleteFromCart = (id, price) => {
-        let items = JSON.parse(localStorage.getItem("cart"));
-        for (let i = 0; i < items.hotels.length; i++) {
-          let targetItem = items.hotels[i].item.id
-          let targetItemPrice = items.hotels[i].item.price
+              products: [],
+              totalPrice: 0
+          }
+      }
+      dispatch({
+          type:  GET_CART_LENGTH,
+          payload: cart.products.length
+      })
+  }
+
+  const getCart = () => {
+      let cart = JSON.parse(localStorage.getItem('cart'))
+      if(!cart){
+          cart = {
+              products: [],
+              totalPrice: 0
+          }
+      }
+      dispatch({
+          type: GET_CART,
+          payload: cart
+      })
+  }
+
+  const changeProductCount = (count, id) => {
+      let cart = JSON.parse(localStorage.getItem('cart'))
+      cart.products = cart.products.map(elem => {
+          if(elem.item.id == id){
+              elem.count = count
+              elem.subPrice = calcSubPrice(elem)
+          }
+          return elem
+      })
+      cart.totalPrice = calcTotalPrice(cart.products)
+      localStorage.setItem('cart', JSON.stringify(cart))
+      getCart()
+  }
+
+  const checkProductInCart = (id) => {
+      let cart = JSON.parse(localStorage.getItem('cart'))
+      if(!cart){
+          cart = {
+              products: [],
+              totalPrice: 0
+          }
+      }
+      let newCart = cart.products.filter(elem => elem.item.id === id)
+      return newCart.length>0 ? true : false
+  } 
+
+
+  // todo DELETE FROM CART
+
+  const deleteFromCart =(id, price)=>{ 
+      let items = JSON.parse(localStorage.getItem('cart')) 
+      for (let i =0; i< items.products.length; i++) { 
+         let targetItem = items.products[i].item.id
+          let targetItemPrice = items.products[i].item.price
+        if (targetItem == id) { 
+            items.products.splice(i, 1); 
+        } 
+        if (targetItemPrice == price){ 
+          items.totalPrice = items.totalPrice - price 
+        } 
+  } 
+    items = JSON.stringify(items); 
+    console.log(items) 
+    localStorage.setItem("cart", items); 
+    getCart() 
+  }
+
+
+
+
+
+
+
 
     
-          if (targetItem == id) {
-            items.hotels.splice(i, 1);
-          }
-          if (targetItemPrice == price) {
-            items.totalPrice = items.totalPrice - price;
-          }
-        }
-        items = JSON.stringify(items);
-        localStorage.setItem("cart", items);
-        getCart();
-      };
       // !!!!!!!!!!!!!!!!!!!!!fovarites
-      
-      const addFovHotel = (hotel) => {
-        let fav = JSON.parse(localStorage.getItem("fav"));
-        if (!fav) {
-          fav = {
-            hotels: [],
-            totalPrice: 0,
-          };
-        }
-        let newProduct = {
-          item: hotel,
-          count: 1,
-          subPrice: 0,
+    const addProductInFavorite = (product) => {
+      let favorite = JSON.parse(localStorage.getItem("favorite"));
+      if (!favorite) {
+        favorite = {
+          products: [],
+          totalPrice: 0,
         };
-        let filteredCart = fav.hotels.filter((elem) => elem.item.id === hotel.id);
-        if (filteredCart.length > 0) {
-          fav.hotels = fav.hotels.filter((elem) => elem.item.id !== hotel.id);
-        } else {
-          fav.hotels.push(newProduct);
+      }
+      let newProduct = {
+        item: product,
+        count: 1,
+        subPrice: 0,
+      };
+      let filteredFavorite = favorite.products.filter(
+        (elem) => elem.item.id === product.id
+      );
+      if (filteredFavorite.length > 0) {
+        favorite.products = favorite.products.filter(
+          (elem) => elem.item.id !== product.id
+        );
+      } else {
+        favorite.products.push(newProduct);
+      }
+      newProduct.subPrice = calcSubPrice(newProduct);
+      favorite.totalPrice = calcTotalPrice(favorite.products);
+      localStorage.setItem("favorite", JSON.stringify(favorite));
+      dispatch({
+        type: CHANGE_FAVORITE_COUNT,
+        payload: favorite.products.length,
+      });
+    };
+    const getFavoriteLength = () => {
+      let favorite = JSON.parse(localStorage.getItem("favorite"));
+      if (!favorite) {
+        favorite = {
+          products: [],
+          totalPrice: 0,
+        };
+      }
+      dispatch({
+        type: CHANGE_FAVORITE_COUNT,
+        payload: favorite.products.length,
+      });
+    };
+    const getFavorite = () => {
+      let favorite = JSON.parse(localStorage.getItem("favorite"));
+      if (!favorite) {
+        favorite = {
+          products: [],
+          totalPrice: 0,
+        };
+      }
+      dispatch({
+        type: FAVORITES,
+        payload: favorite,
+      });
+    };
+    const changeFavoriteCount = (count, id) => {
+      let favorite = JSON.parse(localStorage.getItem("favorite"));
+      favorite.products = favorite.products.map((elem) => {
+        if (elem.item.id == id) {
+          elem.count = count;
+          elem.subPrice = calcSubPrice(elem);
         }
-        
-        newProduct.subPrice = calcSubPriceFov(newProduct);
-        fav.totalPrice = calcTotalPriceFov(fav.hotels);
-        localStorage.setItem("fav", JSON.stringify(fav));
-    
-        dispatch({
-            type: FAVORITES,
-            payload: fav
-        })
-      };
-    
-    const getFovLength = () => {
-        let fav = JSON.parse(localStorage.getItem("fav"));
-        if (!fav) {
-          fav = {
-            hotels: [],
-            totalPrice: 0,
-          };
+        return elem;
+      });
+      favorite.totalPrice = calcTotalPrice(favorite.products);
+      localStorage.setItem("favorite", JSON.stringify(favorite));
+      getFavorite();
+    };
+    const checkProductInFavorite = (id) => {
+      let favorite = JSON.parse(localStorage.getItem("favorite"));
+      if (!favorite) {
+        favorite = {
+          products: [],
+          totalPrice: 0,
+        };
+      }
+      let newFavorite = favorite.products.filter((elem) => elem.item.id === id);
+      return newFavorite.length > 0 ? true : false;
+    };
+    // todo DELETE FROM FAVORITE
+    const deleteFromFavorite = (id, price) => {
+      let items = JSON.parse(localStorage.getItem("favorite"));
+      for (let i = 0; i < items.products.length; i++) {
+        let targetItem = items.products[i].item.id
+        let targetItemPrice = items.products[i].item.price
+        if (targetItem == id) {
+          items.products.splice(i, 1);
         }
-       
-        dispatch({
-            type: FAVORITES,
-            payload: fav,
-          });
-      };
-    
-      const getFov = () => {
-        let fav = JSON.parse(localStorage.getItem("fav"));
-        if (!fav) {
-          fav = {
-            hotels: [],
-            totalPrice: 0,
-          };
+        if (targetItemPrice == price) {
+          items.totalPrice = items.totalPrice - price;
         }
-        dispatch({
-            type: FAVORITES,
-            payload: fav
-          });
-      };
-      
-     const changeHotelCountFov = (count, id) => {
-        let fav = JSON.parse(localStorage.getItem("fav"));
-        fav.hotels = fav.hotels.map((elem) => {
-          if (elem.item.id === id) {
-            elem.count = count;
-            elem.subPrice = calcSubPrice(elem);
-          }
-          return elem;
-        });
-        fav.totalPrice = calcTotalPrice(fav.hotels);
-        localStorage.setItem("fav", JSON.stringify(fav));
-        getFovLength();
-        getFov();
-      };
-    
-    const checkHotelInFov = (id) => {
-        let fav = JSON.parse(localStorage.getItem("fav"));
-        if (!fav) {
-          fav = {
-            hotels: [],
-            totalPrice: 0,
-          };
-        }
-        let newcart = fav.hotels.filter((elem) => elem.id === id);
-        return newcart.length > 0 ? true : false;
-      };
-    
-     const deleteFromFov = (id, price) => {
-        let items = JSON.parse(localStorage.getItem("fav"));
-        for (let i = 0; i < items.hotels.length; i++) {
-          let targetItem = items.hotels[i].item.id
-          let targetItemPrice = items.hotels[i].item.price
-
-    
-          if (targetItem == id) {
-            items.hotels.splice(i, 1);
-          }
-          if (targetItemPrice == price) {
-            items.totalPrice = items.totalPrice - price;
-          }
-        }
-        items = JSON.stringify(items);
-        localStorage.setItem("fav", items);
-        getFov();
-      };
+      }
+      items = JSON.stringify(items);
+      console.log(items);
+      localStorage.setItem("favorite", items);
+      getFavorite();
+    };
 
     return (
         <hotelsContext.Provider
         value={{
          hotels: state.hotels,
          edit: state.edit,
-         cart: state.cart,
-         cartlength: state.cartlength,
-         favorites: state.favorites,
          createStore,
          getHotelsCard,
          handleDelete,
          editHotels,
          saveEditedHotel,
-        //  cart
-         addCartHotel,
-         getCart,
+         //  cart
+         cart: state.cart,
+         cartlLength: state.cartLength,
+         addProductInCart,
          getCartLength,
-         changeHotelCount,
-         checkHotelInCart,
+         getCart,
+         changeProductCount,
+         checkProductInCart,
          deleteFromCart,
-        //  fov
-        getFov,
-        addFovHotel,
-        changeHotelCountFov,
-        checkHotelInFov,
-        deleteFromFov
 
+
+        //  addCartHotel,
+        //  getCart,
+        //  getCartLength,
+        //  changeHotelCount,
+        //  checkHotelInCart,
+        //  deleteFromCart,
+        // favorites
+        favorite: state.favorite,
+        favoriteLength: state.favoriteLength,
+        addProductInFavorite,
+        getFavoriteLength,
+        changeFavoriteCount,
+        checkProductInFavorite,
+        deleteFromFavorite,
+        getFavorite,
+        // COMMNET
+        addComment,
+        getComment,
+        deleteCommnet,
+        comment: state.comment,
+        // pagi
+        pagination: state.pagination
         }}>
             {props.children}
         </hotelsContext.Provider>
