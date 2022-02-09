@@ -5,27 +5,33 @@ import Register from './Auth/Register';
 import Cart from './Cart/Cart';
 import AddStore from './component/CRUD/AddStore/AddStore';
 import EditStore from './component/CRUD/EditStore/EditStore';
-import ListStore from './component/CRUD/ListStore/ListStore';
 import MyNavbar from './MapApi/MyConmponents/MyNavbar/MyNavbar';
 import MyContextProvider from './MyContext/MyContext';
-
+import App2  from './MapApi/App2'
+import ListPage from './ListPage';
+import Fovarites from './Fovarites/Fovarites';
+import MyFooter from './Footer/MyFooter';
+import Google from './Auth/Google';
 const MyRoutes = () => {
     
     return (
         <MyContextProvider>
         <BrowserRouter>
-           <MyNavbar/>
             <Routes>
+                <Route path='/fav' element={ <Fovarites />} /> 
+                <Route path='google' element={<Google/>} />
+                <Route path='/map' element={<App2 />} />
                 <Route path="/register" element={<Register/>}/>
                 <Route path='/login' element={<Login />}/>
                 <Route path='/add' element={<AddStore />} />
-                <Route path='/list' element={<ListStore />} />
+                <Route path='/list' element={<ListPage />} />
                 <Route path='/list/edit/:id' element={<EditStore/>} />
                 <Route path='/cart' element={<Cart/>} />
             </Routes>
+            <MyFooter />
         </BrowserRouter>
         </MyContextProvider>
     );
 };
 
-export default MyRoutes;
+export default MyRoutes;    

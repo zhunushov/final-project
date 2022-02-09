@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { CssBaseline, Grid } from "@material-ui/core";
-import { getPlaceData, getWeatherData } from "./api";
-import Header from "./components/Header/Header";
-import List from "./components/List/List";
-import Map from "./components/Map/Map";
+import { getPlaceData, getWeatherData } from "./index";
+import MyNavbar from "./MyConmponents/MyNavbar/MyNavbar";
+import List from "./MyConmponents/List/List";
+import Map from "./MyConmponents/Map/Map";
 
 
 const App = () => {
@@ -18,7 +18,7 @@ const App = () => {
   const [places, setPlaces] = useState([])
    
   const [autocomplete, setAutocomplete] = useState(null)
-  const [ childClicked, setChildClicked] = useState(null)
+  const [childClicked, setChildClicked] = useState(null)
   const [isLoading, setIsLoading] = useState(false)
 
 
@@ -63,9 +63,9 @@ const App = () => {
   return (
     <>
       <CssBaseline />
-       <Header  onLoad={onLoad}  onPlaceChanged={onPlaceChanged} />
+       <MyNavbar  onLoad={onLoad}  onPlaceChanged={onPlaceChanged}/>
         <Grid container spacing={3} style={{ width: "100%"}}>
-        {/* <Grid item xs={12} md={4}>
+        <Grid item xs={12} md={4}>
           <List 
           isLoading={isLoading}
           childClicked={childClicked}
@@ -86,7 +86,7 @@ const App = () => {
           places={filteredPlaces.length ? filteredPlaces : places}
           weatherData={weatherData}
           />
-        </Grid> */}
+        </Grid>
       </Grid>
     </>
   );

@@ -46,7 +46,7 @@ const Login = () => {
           </TextField>
           </Grid>
           <Grid item xs={2} md={2} sm={2}>
-              <Button type='submit' color="secondary">Sign Ip</Button>
+              <Button type='submit' color="secondary">Sign In</Button>
               <Link to='/register'><Button> Sign Up</Button></Link>
           </Grid>
         </Box>

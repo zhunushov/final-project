@@ -9,8 +9,8 @@ import Paper from "@mui/material/Paper";
 import { Button, IconButton, TableRow, Typography } from "@mui/material";
 import { hotelsContext } from "../MyContext/MyContext";
 import { Link } from "react-router-dom";
-import { calcTotalPrice } from "./CartPrice";
-import { DeleteForeverOutlined } from "@material-ui/icons";
+// import { calcTotalPrice } from "./CartPrice";
+import { ArrowBack, DeleteForeverOutlined } from "@material-ui/icons";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -31,9 +31,10 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
 }));
 
 export default function Cart() {
-  const { cart, getCart, deleteFromCart, changeHotelCount } = useContext(hotelsContext);
+  const { favorites, getFov, deleteFromFov, changeHotelCountFov  } = useContext(hotelsContext);
+   console.log(favorites.fav, 'fov');
   useEffect(() => {
-    getCart();
+    getFov();
   }, []);
 
   return (
@@ -42,17 +43,14 @@ export default function Cart() {
         <TableHead>
           <TableRow>
             <StyledTableCell align="center">Image</StyledTableCell>
-            <StyledTableCell align="center">Title</StyledTableCell>
-            <StyledTableCell align="center">Price</StyledTableCell>
-            <StyledTableCell align="center">Count</StyledTableCell>
-            <StyledTableCell align="center">Type</StyledTableCell>
+            <StyledTableCell align="center">Name</StyledTableCell>
             <StyledTableCell align="center">Delete</StyledTableCell>
           </TableRow>
         </TableHead>
         <TableBody>
-          {cart.hotels ? (
+          {favorites.hotels ? (
             <>
-              {cart.hotels.map((elem, index) => (
+              {favorites.hotels.map((elem, index) => (
                 <StyledTableRow key={index}>
                   <StyledTableCell component="th" scope="row">
                     <img
@@ -64,27 +62,11 @@ export default function Cart() {
                   <StyledTableCell align="center">
                     {elem.item._document.data.value.mapValue.fields.name.stringValue}
                   </StyledTableCell>
-                  <StyledTableCell height="120" align="center">
-                    {elem.item._document.data.value.mapValue.fields.price.stringValue}
-                  </StyledTableCell>
-                  <StyledTableCell align="center">
-                    <input
-                      type="number"
-                      value={elem.count}
-                      onChange={(e) =>
-                        changeHotelCount(e.target.value, elem.item.id)
-                      }
-                      min="1"
-                    />
-                  </StyledTableCell>
-                  <StyledTableCell align="center">
-                   {elem.item._document.data.value.mapValue.fields.brand.stringValue}
-                  </StyledTableCell>
                   <StyledTableCell align="center">
                     <IconButton
                       aria-label="delete"
                       onClick={() =>
-                        deleteFromCart(elem.item.id, elem.item.price)
+                        deleteFromFov(elem.item.id, elem.item.price)
                       }
                     >
                       <DeleteForeverOutlined />
@@ -101,23 +83,10 @@ export default function Cart() {
             </TableRow>
           )}
           <TableRow>
-            <TableCell rowSpan={3} />
-            <TableCell colSpan={2}>
-              <Typography variant="h5">Total:</Typography>
-            </TableCell>
-            {cart.hotels ? (
-              <TableCell align="right">
-                <Typography variant="h5">
-                  {calcTotalPrice(cart.hotels)}
-                </Typography>
-              </TableCell>
-            ) : null}
-          </TableRow>
-          <TableRow>
-            <TableCell colSpan={3} align="right">
-              <Link to="/credit">
+            <TableCell colSpan={3} align="center">
+              <Link to="/list">
                 <Button variant="contained" color="primary">
-                  BUY
+                  <ArrowBack  />
                 </Button>
               </Link>
             </TableCell>

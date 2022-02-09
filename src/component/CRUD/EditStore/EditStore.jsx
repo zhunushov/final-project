@@ -40,7 +40,6 @@ import { Link } from 'react-router-dom';
     }
 
     saveEditedHotel(id , newPost)
-    console.log(newPost ,  'my');
     setNewPost({ name: "",  brand: "",  price: "",  description: "",  image: "",  rating: "",});
     };
 

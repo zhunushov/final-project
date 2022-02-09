@@ -1,21 +1,35 @@
 import React, { useContext, useState }from 'react';
-// import { Autocomplete } from '@react-google-maps/api';
-import { AppBar, Badge, Box, Button, IconButton, InputBase, Toolbar, Typography } from '@material-ui/core';
+import { Autocomplete } from '@react-google-maps/api';
+import { AppBar,  Badge,  Box, Button, IconButton, InputBase, Menu, MenuItem, Toolbar, Typography } from '@material-ui/core';
 import SearchIcon from '@material-ui/icons/Search';
 import useStyles from './style'
-import {  ShoppingCart } from '@material-ui/icons';
+import {  AccountCircle, LocalDiningOutlined, More, NextWeek, PersonAdd } from '@material-ui/icons';
 import { hotelsContext } from '../../../MyContext/MyContext';
 import { logout, useAuth } from '../../../Auth/Auth';
 import { Link } from 'react-router-dom';
-
-const MyNavbar = () => {
-    
+import LogoutIcon from '@mui/icons-material/Logout';
+const MyNavbar = ({ onPlaceChanged , onLoad }) => {
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = useState(null);
+  const isMenuOpen = Boolean(anchorEl);
+  const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+    handleMobileMenuClose();
+  };
+  const handleMobileMenuClose = () => {
+    setMobileMoreAnchorEl(null);
+  };
+  const handleProfileMenuOpen = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+  const handleMobileMenuOpen = (event) => {
+    setMobileMoreAnchorEl(event.currentTarget);
+  };
+  // !!!!!!!!!!!!!!!!!!!
     const currentUser = useAuth()
-    const { cartLength } = useContext(hotelsContext)
     const classes = useStyles()
 
-
-    
   async function handleLogout() {
     try {
       await logout();
@@ -23,6 +37,54 @@ const MyNavbar = () => {
       console.log(error);
     }
   }
+  const mobileMenuId = 'primary-search-account-menu-mobile';
+  const renderMobileMenu = (
+    <Menu
+      anchorEl={mobileMoreAnchorEl}
+      anchorOrigin={{
+        vertical: 'top',
+        horizontal: 'right',
+      }}
+      id={mobileMenuId}
+      keepMounted
+      transformOrigin={{
+        vertical: 'top',
+        horizontal: 'right',
+      }}
+      open={isMobileMenuOpen}
+      onClose={handleMobileMenuClose}
+    >
+    </Menu>
+  );
+     
+
+
+  const menuId = 'primary-search-account-menu';
+  const renderMenu = (
+    <Menu
+      anchorOrigin={{
+        vertical: 'top',
+        horizontal: 'right',
+      }}
+      id={menuId}
+      keepMounted
+      transformOrigin={{
+        vertical: 'top',
+        horizontal: 'right',
+      }}
+      open={isMenuOpen}
+      onClose={handleMenuClose}>
+      <Button onClick={logout}>
+      <MenuItem onClick={handleMenuClose}>Logout</MenuItem>
+      </Button>
+        <Link to='/login' style={{textDecoration: 'none'}}>
+      <MenuItem onClick={handleMenuClose}>Sign In</MenuItem>
+        </Link>
+      <Link to="/register" style={{textDecoration: 'none'}}> 
+       <MenuItem onClick={handleMenuClose}>Sign Up</MenuItem>
+      </Link>
+    </Menu>
+  );
 
     return (
         <AppBar position='static'>
@@ -43,27 +105,33 @@ const MyNavbar = () => {
                        </div>
                    {/* </Autocomplete> */}
                    <Link to="/cart" style={{ color: "white" }}>
-                    <IconButton color="inherit">
-                      <Badge badgeContent={cartLength} color="secondary">
-                    <ShoppingCart />
-                    </Badge>
-                </IconButton>
                   </Link>
-              { currentUser?.email }
-              {currentUser ? (
-            <Button
-              loadingPosition="end"
-              variant="contained"
-            
-              disabled={!currentUser}
-              onClick={handleLogout}
-            >
-              Выйти
-            </Button>
-          ) : null}
-
+                   {currentUser?.email.substring(0, currentUser.email.length - 10)}
+                   <IconButton
+                   size="large"
+                   edge="end"
+                   aria-label="account of current user"
+                   aria-controls={menuId}
+                   aria-haspopup="true"
+                   onClick={handleProfileMenuOpen}
+                    color="inherit" >
+              <AccountCircle />
+            </IconButton>
                </Box>
+               <Box sx={{ display: { xs: 'flex', md: 'none' } }}>
+            <IconButton
+              size="large"
+              aria-label="show more"
+              aria-controls={mobileMenuId}
+              aria-haspopup="true"
+              onClick={handleMobileMenuOpen}
+              color="inherit">
+              <More />
+              </IconButton>
+             </Box>
             </Toolbar>
+            {renderMenu}
+             {renderMobileMenu}
         </AppBar>
     );
 };
