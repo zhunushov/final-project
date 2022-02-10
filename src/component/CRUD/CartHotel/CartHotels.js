@@ -4,6 +4,7 @@ import { CssBaseline } from '@mui/material';
 import React, { useContext, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { hotelsContext } from '../../../MyContext/MyContext';
+import "../../../Cart/Cart.css"
 const ListStore = ({ item }) => {  
     const {addProductInCart, handleDelete, checkProductInCart,  addProductInFavorite } = useContext(hotelsContext)
 
@@ -15,7 +16,7 @@ const ListStore = ({ item }) => {
            <Card container style={{alignItems:'center', maxWidth: "75%",  borderRadius: "4%", justifyContent: "center" , margin: "auto" , backgroundColor: "#628C9C"}}>
             <CardMedia image={item._document.data.value.mapValue.fields.image.stringValue}  style={{height: 400,  maxWidth: "100%",  margin: "14px",  borderRadius: "4%",}} />
             <CardContent>
-          <div style={{display: "flex", justifyContent: "space-between"}}>
+          <div className='cartTitle' style={{display: "flex", justifyContent: "space-between"}}>
              <Typography  variant='h6'>
               Name:  {item._document.data.value.mapValue.fields.name.stringValue}
              </Typography>
@@ -47,6 +48,11 @@ const ListStore = ({ item }) => {
              <Link to={`edit/${item.id}`}  style={{textDecoration: "none"}}>
              <Button >
                  Edit
+             </Button>
+             </Link>
+             <Link to="/credit"  style={{textDecoration: "none"}}>
+             <Button >
+                 Купить
              </Button>
              </Link>
 

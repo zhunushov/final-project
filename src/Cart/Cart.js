@@ -11,6 +11,7 @@ import { hotelsContext } from "../MyContext/MyContext";
 import { Link } from "react-router-dom";
 import { calcTotalPrice } from "./CartPrice";
 import { DeleteForeverOutlined } from "@material-ui/icons";
+import "../Cart/Cart.css"
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -63,7 +64,7 @@ export default function Cart() {
                   </StyledTableCell>
                   <StyledTableCell align="center">
                     {elem.item._document.data.value.mapValue.fields.name.stringValue}
-                  </StyledTableCell>
+                  </StyledTableCell>q
                   <StyledTableCell height="120" align="center">
                     {elem.item._document.data.value.mapValue.fields.price.integerValue}
                   </StyledTableCell>

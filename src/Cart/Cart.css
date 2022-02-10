@@ -1,0 +1,6 @@
+@media screen and (max-width: 605px) {
+  .cartTitle{
+      display: block !important;
+      /* justify-content: space-between !important; */
+  }
+  }

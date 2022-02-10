@@ -2,8 +2,20 @@ import React  from 'react';
 import { Box, Button, Container, CssBaseline, Grid, TextField, Typography } from '@material-ui/core'
 import { signUp } from './Auth';
 import { Link, useNavigate } from 'react-router-dom';
+import MyNavbar from '../MapApi/MyConmponents/MyNavbar/MyNavbar';
+import GoogleIcon from '@mui/icons-material/Google';
+import { Form } from "react-bootstrap"
+import { GoogleAuthProvider , signInWithPopup } from 'firebase/auth';
+import { auth } from './Firebase';
 const Register = () => {
-    
+    const provider = new GoogleAuthProvider()
+    const authGoogle = async () => {
+        try {
+            const res = await signInWithPopup(auth, provider)
+        } catch (error) {
+            console.log(error);
+        }
+    }
     const navigate = useNavigate()
      const handleSubmit = (event) => {
         event.preventDefault()
@@ -23,35 +35,38 @@ const Register = () => {
          }
      }
     return (
-        <Container>
-           <CssBaseline />
-           <Typography variant='h2'> Sign Up</Typography>
-           <Box component='form' noValidate   onSubmit={handleSubmit} >
-             <Grid item xs={12} >
-             <TextField
-             required
-             fullWidth
-             name='email'
-             label="Email"
-             >
-             </TextField>
-             </Grid>
-             <Grid item xs={12} >
-             <TextField
-             required
-             fullWidth
-             type="password"
-             name='password'
-             label="Password"
-             >
-             </TextField>
-             </Grid>
-             <Grid item xs={2} md={2} sm={2}>
-                 <Button type='submit' color="secondary">sign up</Button>
-                 <Link to='/login'><Button> sign in</Button></Link>
-             </Grid>
-           </Box>
-        </Container>
+        <>
+         <MyNavbar/>
+        <Form style={{maxWidth: "70%",  display: "grid",margin: "auto", textAlign: "center", backgroundColor: "#C3D1FF", height: "100%", marginBottom: "18%"}}>
+        <CssBaseline />
+        <Typography variant='h4' style={{marginTop: "30px"}}> Sign Up</Typography>
+        <Box component='form' className="mb-3" noValidate   onSubmit={handleSubmit} >
+          <Form.Group item xs={6} >
+          <TextField
+          required
+          fullWidth
+          name='email'
+          label="Email">
+          </TextField>
+          </Form.Group>
+          <Form.Group item xs={6} >
+          <TextField
+          required
+          fullWidth
+          type="password"
+          name='password'
+          label="Password"
+          >
+          </TextField>
+          </Form.Group>
+          <Grid style={{margin: "5px"}} >
+              <Button type='submit' variant='contained'  color="primary">Sign Up</Button>
+              <Button onClick={authGoogle} style={{margin: "8px"}}  variant='contained' color='secondary'><GoogleIcon />Google </Button>
+              <Link to='/login'  style={{ textDecoration: "none"}}><Button variant='outlined'color="primary" > Sign In</Button></Link>
+          </Grid>
+        </Box>
+     </Form>
+        </>
     );
 };
 

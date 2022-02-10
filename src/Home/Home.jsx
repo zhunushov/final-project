@@ -126,13 +126,13 @@ const Home = () => {
             <div>
                 {
                     comment ? comment.map((item) => (
-                    <div style={{backgroundColor: "#DFE69D", borderRadius: "15%"}} >
+                    <div style={{backgroundColor: "#DFE69D", borderRadius: "15%"}}  gutterbottom>
                     <div style={{textAlign: 'center'}}> <span style={{marginLeft: "30%"}}>{item.comment}  <span style={{color: "red",}}> { currentUser?.email} </span>   </span><IconButton onClick={() => deleteCommnet(item.id)} style={{marginLeft: "30%"}}> <Delete /> </IconButton>  </div>
                      
                     </div>
                     )): <h1>loading ..</h1>
                 }
-            <div style={{alignItems: 'center', justifyContent: "center", textAlign: 'center', display: "grid"}}>
+            <div style={{alignItems: 'center', justifyContent: "center", textAlign: 'center', display: "grid"}}  >
                      <Pagination count={pagination} onChange={handlePage} page={+page} />
             </div>
             </div>

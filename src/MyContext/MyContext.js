@@ -20,7 +20,8 @@ const INIT_STATE = {
     pagination: 1,
 
     // commnet
-    comment:[]
+    comment:[],
+    bottele: {}
 }
 const GET_STORE = "GET_STORE"
 const EDIT_STORE = "EDIT_STORE"
@@ -32,6 +33,8 @@ const FAVORITES = "FAVORITES"
 const CHANGE_FAVORITE_COUNT = "CHANGE_FAVORITE_COUNT"
 
 const GET_COMMENT = "GET_COMMENT"
+
+const BOT_TELEGRAM = "BOT_TELEGRAM"
 const reducer = (state = INIT_STATE, action) => {
     switch(action.type) {
         case GET_STORE :
@@ -52,6 +55,8 @@ const reducer = (state = INIT_STATE, action) => {
             return {...state, comment: action.payload.data, 
               pagination: Math.ceil(action.payload.headers["x-total-count"] / 3)
             }
+        case BOT_TELEGRAM :
+          return {...state, bottele: action.payload}
 
         default : return state
     }
@@ -368,7 +373,42 @@ const MyContext = (props) => {
       localStorage.setItem("favorite", items);
       getFavorite();
     };
-
+    //  ! Telegrm BOT
+     const getProductsToBot = async (info, cart) => {
+        try {
+         const res = await axios.get(
+            "https://api.telegram.org/bot5151950617:AAG942tRzLTxHXooJJ9uNjNMi1DVeCq9Fb8_M/sendMessage",
+            {
+              params: {
+                parse_mode: "HTML",
+                text: ` Заказы 
+                firs tName: ${info.firstName}
+                last Name: ${info.lastName}
+                address: ${info.address}
+                country: ${info.country}
+                ${INIT_STATE.cart.products.reduce(
+                  (item, cur) =>
+                    item +
+                    `category: ${cur.product.name}, price:${cur.product.price},id:${cur.product.id}\n`,
+                  ""
+                )}\ntotalPrice: ${cart.totalPrice}`,
+    
+                chat_id: "1054740335",
+              },
+            }
+          );
+          toast.success("We have successfully ordered the goods");
+          const action = {
+            type: BOT_TELEGRAM,
+            payload: res.data,
+          };
+          dispatch(action);
+        } catch (error) {
+          console.log(error);
+          toast.error("Произошла ошибка! Попробуйте снова");
+        }
+      
+    };
     return (
         <hotelsContext.Provider
         value={{
@@ -388,6 +428,9 @@ const MyContext = (props) => {
          changeProductCount,
          checkProductInCart,
          deleteFromCart,
+
+
+         getProductsToBot,
 
 
         //  addCartHotel,
