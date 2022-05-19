@@ -24,7 +24,7 @@ const ListStore = ({ item }) => {
               Type:   {item._document.data.value.mapValue.fields.brand.stringValue}
              </Typography>
              <Typography  variant='body1'>
-              Price $  {item._document.data.value.mapValue.fields.price.integerValue}
+              Price $  {item._document.data.value.mapValue.fields.price.stringValue}
              </Typography>
              <Typography variant='h6'>
                Rading:  {item._document.data.value.mapValue.fields.rating.stringValue}

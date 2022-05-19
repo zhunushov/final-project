@@ -36,19 +36,19 @@ const Login = () => {
     return (
         <>
         <MyNavbar/>
-        <Form style={{maxWidth: "70%",  display: "grid",margin: "auto", textAlign: "center", backgroundColor: "#C3D1FF", height: "100%", marginBottom: "18%"}}>
+        <div style={{maxWidth: "70%",  display: "grid",margin: "auto", textAlign: "center", backgroundColor: "#C3D1FF", height: "100%", marginBottom: "18%"}}>
         <CssBaseline />
         <Typography variant='h4' style={{marginTop: "30px"}}> Sign In</Typography>
         <Box component='form' className="mb-3" noValidate   onSubmit={handleSubmit} >
-          <Form.Group item xs={6} >
+          <div item xs={6} >
           <TextField
           required
           fullWidth
           name='email'
           label="Email">
           </TextField>
-          </Form.Group>
-          <Form.Group item xs={6} >
+          </div>
+          <div item xs={6} >
           <TextField
           required
           fullWidth
@@ -57,14 +57,14 @@ const Login = () => {
           label="Password"
           >
           </TextField>
-          </Form.Group>
+          </div>
           <Grid style={{margin: "5px"}} >
               <Button type='submit' variant='contained'  color="primary">Sign In</Button>
               <Button onClick={authGoogle} style={{margin: "8px"}}  variant='contained' color='secondary'><GoogleIcon />Google </Button>
               <Link to='/register'  style={{ textDecoration: "none"}}><Button variant='outlined'color="primary" > Sign Up</Button></Link>
           </Grid>
         </Box>
-     </Form>
+     </div>
         </>
     );
 };

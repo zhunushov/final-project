@@ -14,7 +14,6 @@ import KaruselMainPage from './component/KaruselMainPage/KaruselMainPage';
 import Home from './Home/Home';
 import Creditcard from './component/CreditCard/CreditCard';
 import App3 from './App3/App3';
-import BotTele from './BotTele/BotTele'
 const MyRoutes = () => {
     return (
         <MyContextProvider>
@@ -32,7 +31,6 @@ const MyRoutes = () => {
                 <Route path='/caruselMain' element={<KaruselMainPage/>} />
                 <Route path='/credit' element={<Creditcard />} />
                 <Route path='/chat' element={<App3 />} />
-                <Route path='/bot' element={<BotTele />}/>
             </Routes>
             <MyFooter />
         </BrowserRouter>

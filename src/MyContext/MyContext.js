@@ -66,6 +66,7 @@ const MyContext = (props) => {
     const [state, dispatch] = useReducer(reducer, INIT_STATE);
 
   //  ! create
+
      const createStore = async (newHotel) => {
         try {
             await addDoc(collection(db, "stores"), newHotel)
@@ -76,7 +77,9 @@ const MyContext = (props) => {
         
     }
   // !read
-    const getHotelsCard = async () => {
+
+   
+  const getHotelsCard = async () => {
         try{
             const res = query(collection(db, "stores"));
             const unsubscribe =  onSnapshot(res, (item) => {
@@ -84,26 +87,32 @@ const MyContext = (props) => {
             item.forEach((item) => {
                 hotels.push(item);
             });
+
             let action = {
               type: GET_STORE,
               payload: hotels
             }
+
             dispatch(action)});
           }catch(err){
                 console.log(err)
         }
     }
     // ! Delete
+
      const handleDelete  = async (id) =>  {
-        const delHot = doc(db, "stores", id)
+        const delHot = doc(db, "g", id)
         await deleteDoc(delHot)
         getHotelsCard() 
      };
     //  ! Edit 
+    
      const editHotels = async (id) => {
       try {
           const docRef = doc(db, "stores", id);
+          
           const docSnap = await getDoc(docRef);
+
           let action = {
             type: EDIT_STORE,
             payload: docSnap.data()
@@ -374,41 +383,7 @@ const MyContext = (props) => {
       getFavorite();
     };
     //  ! Telegrm BOT
-     const getProductsToBot = async (info, cart) => {
-        try {
-         const res = await axios.get(
-            "https://api.telegram.org/bot5151950617:AAG942tRzLTxHXooJJ9uNjNMi1DVeCq9Fb8_M/sendMessage",
-            {
-              params: {
-                parse_mode: "HTML",
-                text: ` Заказы 
-                firs tName: ${info.firstName}
-                last Name: ${info.lastName}
-                address: ${info.address}
-                country: ${info.country}
-                ${INIT_STATE.cart.products.reduce(
-                  (item, cur) =>
-                    item +
-                    `category: ${cur.product.name}, price:${cur.product.price},id:${cur.product.id}\n`,
-                  ""
-                )}\ntotalPrice: ${cart.totalPrice}`,
-    
-                chat_id: "1054740335",
-              },
-            }
-          );
-          toast.success("We have successfully ordered the goods");
-          const action = {
-            type: BOT_TELEGRAM,
-            payload: res.data,
-          };
-          dispatch(action);
-        } catch (error) {
-          console.log(error);
-          toast.error("Произошла ошибка! Попробуйте снова");
-        }
-      
-    };
+
     return (
         <hotelsContext.Provider
         value={{
@@ -430,16 +405,7 @@ const MyContext = (props) => {
          deleteFromCart,
 
 
-         getProductsToBot,
 
-
-        //  addCartHotel,
-        //  getCart,
-        //  getCartLength,
-        //  changeHotelCount,
-        //  checkHotelInCart,
-        //  deleteFromCart,
-        // favorites
         favorite: state.favorite,
         favoriteLength: state.favoriteLength,
         addProductInFavorite,

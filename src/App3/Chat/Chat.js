@@ -2,8 +2,7 @@ import React, { useState } from 'react';
 import { useAuth } from "../../Auth/Auth"
 import { Avatar, Button, Container, Grid, TextField } from "@material-ui/core"
 import { db } from '../../Auth/Firebase';
-import firebase from 'firebase/compat/app';
-import {addDoc, collection} from 'firebase/firestore'
+    import {addDoc, collection} from 'firebase/firestore'
 import {useCollectionData} from "react-firebase-hooks/firestore";
 
 const Chat = () => {
